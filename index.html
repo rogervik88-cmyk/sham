@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Impostor — Infinite Categories</title>
+<style>
+:root{--bg:#070b12;--panel:#101722;--panel2:#151e2b;--text:#f4f7fb;--muted:#8e9bad;--accent:#54e36f;--danger:#ff4d55;--line:#263242}
+*{box-sizing:border-box} body{margin:0;background:radial-gradient(circle at 50% -10%,#1b2940 0,#070b12 45%);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;min-height:100vh}
+button,input{font:inherit} button{cursor:pointer;border:0;color:var(--text)} .app{max-width:760px;margin:auto;min-height:100vh;padding:22px 18px 40px}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}.brand{font-weight:900;letter-spacing:.08em;font-size:25px}.brand span{color:var(--danger)} .pill{border:1px solid var(--line);background:#0d141f;padding:8px 11px;border-radius:999px;color:var(--muted);font-size:13px}
+.screen{display:none}.screen.active{display:block}.hero{text-align:center;padding:34px 12px 22px}.hero h1{font-size:clamp(40px,11vw,74px);margin:0 0 8px;line-height:1;font-weight:950}.hero h1 em{color:var(--danger);font-style:normal}.hero p{color:var(--muted);font-size:16px;margin:0 auto 26px;max-width:520px}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.card{background:linear-gradient(180deg,#141d2a,#0e151f);border:1px solid var(--line);border-radius:18px;padding:18px}.card h3{margin:0 0 7px}.card p{color:var(--muted);margin:0;font-size:13px;line-height:1.45}
+.primary{width:100%;background:var(--accent);color:#06100a;font-weight:900;padding:15px;border-radius:14px;font-size:16px;margin-top:16px}.secondary{width:100%;background:var(--panel2);border:1px solid var(--line);padding:14px;border-radius:14px;margin-top:10px}
+.row{display:flex;gap:10px}.row>*{flex:1}.panel{background:rgba(16,23,34,.92);border:1px solid var(--line);border-radius:20px;padding:20px;margin-bottom:14px}.panel h2{margin:0 0 16px}.label{display:block;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.08em;margin:14px 0 7px}
+input{width:100%;background:#0b111a;border:1px solid var(--line);border-radius:12px;padding:13px;color:var(--text);outline:none}input:focus{border-color:#4cbb62}
+.options{display:flex;flex-wrap:wrap;gap:8px}.opt{background:#0b111a;border:1px solid var(--line);padding:10px 12px;border-radius:11px}.opt.on{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent);color:var(--accent)}
+.center{text-align:center}.bigcat{font-size:clamp(30px,8vw,54px);font-weight:950;margin:12px 0 22px}.role{font-size:30px;font-weight:950;margin:8px 0}.secret{background:#0b111a;border:1px dashed #39495d;border-radius:16px;padding:18px;text-align:center;color:#c8d1dd}.secret strong{font-size:24px;display:block;margin-top:7px}
+.players{display:grid;gap:8px}.player{display:flex;justify-content:space-between;align-items:center;background:#0b111a;border:1px solid var(--line);border-radius:12px;padding:11px 13px}.vote{background:#1c2634;padding:7px 11px;border-radius:9px}.vote.selected{background:var(--danger)} .timer{font-variant-numeric:tabular-nums;color:var(--accent);font-weight:900}.progress{height:7px;background:#202b39;border-radius:99px;overflow:hidden;margin:10px 0 18px}.progress i{display:block;height:100%;background:var(--accent);width:100%;transition:width .2s linear}
+.small{font-size:13px;color:var(--muted)}.back{background:none;color:var(--muted);padding:0 0 15px}.hidden{display:none!important}
+@media(max-width:520px){.grid{grid-template-columns:1fr}.row{flex-direction:column}.app{padding-left:14px;padding-right:14px}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top"><div class="brand">IMPOST<span>OR</span></div><div class="pill">∞ categories</div></div>
+
+  <section id="home" class="screen active">
+    <div class="hero"><h1>Find the <em>Impostor.</em></h1><p>A pass-and-play social deduction game where everyone gets a secret answer except the impostor. The category engine can create practically endless combinations.</p></div>
+    <div class="grid">
+      <div class="card"><h3>♾️ Infinite categories</h3><p>Mix themes, places, eras, difficulty and custom prompts to generate new rounds.</p></div>
+      <div class="card"><h3>👥 Party ready</h3><p>2–12 players on one phone. Pass the device for private role reveals.</p></div>
+      <div class="card"><h3>🕵️ One impostor</h3><p>Give clues without making the answer too obvious.</p></div>
+      <div class="card"><h3>⚡ Fast rounds</h3><p>Discuss, vote, reveal and instantly start another round.</p></div>
+    </div>
+    <button class="primary" onclick="show('setup')">CREATE GAME</button>
+  </section>
+
+  <section id="setup" class="screen">
+    <button class="back" onclick="show('home')">← Back</button>
+    <div class="panel">
+      <h2>Game setup</h2>
+      <label class="label">Players (2–12)</label>
+      <input id="playerCount" type="number" min="2" max="12" value="6">
+      <label class="label">Player names</label>
+      <div id="names"></div>
+      <label class="label">Category style</label>
+      <div class="options" id="styles"></div>
+      <label class="label">Custom category (optional)</label>
+      <input id="custom" placeholder="e.g. things in my school">
+      <div class="row">
+        <div><label class="label">Impostors</label><select id="impCount" style="width:100%;padding:13px;background:#0b111a;color:white;border:1px solid #263242;border-radius:12px"><option>1</option><option>2</option></select></div>
+        <div><label class="label">Discussion seconds</label><input id="seconds" type="number" min="20" max="180" value="60"></div>
+      </div>
+      <button class="primary" onclick="startGame()">START ROUND</button>
+    </div>
+  </section>
+
+  <section id="reveal" class="screen">
+    <div class="center">
+      <div class="small">PRIVATE ROLE REVEAL</div>
+      <h2 id="revealName"></h2>
+      <div class="secret"><span>Your role</span><div id="revealRole" class="role"></div><div id="revealSecret"></div></div>
+      <button class="primary" id="revealBtn" onclick="nextReveal()">HOLD TO REVEAL</button>
+    </div>
+  </section>
+
+  <section id="round" class="screen">
+    <div class="panel center">
+      <div class="small">ROUND <span id="roundNo">1</span> • <span id="timer" class="timer"></span></div>
+      <div class="progress"><i id="bar"></i></div>
+      <div class="small">CATEGORY</div><div class="bigcat" id="category"></div>
+      <p class="small">Give a clue that fits the category. The impostor must bluff.</p>
+      <button class="primary" onclick="showDiscussion()">START DISCUSSION</button>
+    </div>
+  </section>
+
+  <section id="discussion" class="screen">
+    <div class="panel">
+      <div style="display:flex;justify-content:space-between"><h2>Who is the impostor?</h2><span id="voteTimer" class="timer"></span></div>
+      <p class="small">Talk it out, then each player votes for one person.</p>
+      <div id="voteList" class="players"></div>
+      <button class="primary" onclick="finishVote()">REVEAL RESULT</button>
+      <button class="secondary" onclick="newRound()">NEXT ROUND</button>
+    </div>
+  </section>
+
+  <section id="result" class="screen">
+    <div class="panel center">
+      <div class="small">THE ANSWER WAS</div><div class="bigcat" id="resultCat"></div>
+      <div class="small">IMPOSTOR(S)</div><h2 id="resultImp"></h2>
+      <p id="resultText"></p>
+      <button class="primary" onclick="newRound()">PLAY AGAIN</button>
+      <button class="secondary" onclick="show('home')">END GAME</button>
+    </div>
+  </section>
+</div>
+
+<script>
+const styles=["Everything","Animals","Food","Movies","Games","Places","School","Sports","Science","History","Music","Random"];
+const banks={
+Animals:["animals that can fly","ocean animals","animals found in Canada","mythical creatures","animals with unusual defenses"],
+Food:["breakfast foods","street foods","desserts","pizza toppings","foods from around the world","snacks"],
+Movies:["superhero movies","animated movies","classic movies","movie villains","movies set in space"],
+Games:["video games","board games","party games","games with teams","retro games"],
+Places:["cities","countries","tourist attractions","places in nature","places you would visit in winter"],
+School:["school subjects","things in a backpack","classroom objects","school activities","things students forget"],
+Sports:["team sports","Olympic sports","sports equipment","sports played with a ball","winter sports"],
+Science:["planets and space","animals in science","weather","human body topics","things in a laboratory"],
+History:["ancient civilizations","historical inventions","famous explorers","historical places","things from the 1900s"],
+Music:["music genres","instruments","concert experiences","things in a recording studio","music technology"],
+Random:["things you can collect","things that are noisy","things that are tiny","things you see at night","things that are surprisingly expensive","things found at a beach","things people do on weekends"]
+};
+let players=[], impostors=[], current=0, category="", seconds=60, interval=null, style="Everything";
+
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');if(id==='setup')renderNames();}
+function renderNames(){
+ const n=Math.max(2,Math.min(12,+document.getElementById('playerCount').value||6)); 
+ const box=document.getElementById('names');box.innerHTML='';
+ for(let i=0;i<n;i++){let inp=document.createElement('input');inp.placeholder=`Player ${i+1}`;inp.value=players[i]?.name||`Player ${i+1}`;inp.style.marginBottom='7px';box.appendChild(inp)}
+}
+document.getElementById('playerCount').addEventListener('input',renderNames);
+const sb=document.getElementById('styles');styles.forEach((s,i)=>{let b=document.createElement('button');b.className='opt'+(i===0?' on':'');b.textContent=s;b.onclick=()=>{document.querySelectorAll('#styles .opt').forEach(x=>x.classList.remove('on'));b.classList.add('on');style=s};sb.appendChild(b)});
+
+function pickCategory(){
+ if(document.getElementById('custom').value.trim()) return document.getElementById('custom').value.trim();
+ let pool=[];
+ if(style==='Everything') Object.values(banks).forEach(a=>pool.push(...a));
+ else pool=banks[style]||banks.Random;
+ const base=pool[Math.floor(Math.random()*pool.length)];
+ const modifiers=[""," — easy"," — hard"," — weird edition"," — speed round"," — family edition"];
+ return base+modifiers[Math.floor(Math.random()*modifiers.length)];
+}
+function startGame(){
+ const inputs=[...document.querySelectorAll('#names input')];
+ players=inputs.map((x,i)=>({name:x.value.trim()||`Player ${i+1}`}));
+ const count=Math.max(1,Math.min(+document.getElementById('impCount').value,Math.floor(players.length/2)));
+ impostors=[];while(impostors.length<count){let x=Math.floor(Math.random()*players.length);if(!impostors.includes(x))impostors.push(x)}
+ category=pickCategory();seconds=+document.getElementById('seconds').value||60;current=0;show('reveal');renderReveal();
+}
+function renderReveal(){
+ document.getElementById('revealName').textContent=players[current].name;
+ document.getElementById('revealRole').textContent='READY';
+ document.getElementById('revealSecret').innerHTML='Tap the button, then pass the phone.';
+ document.getElementById('revealBtn').textContent='HOLD TO REVEAL';
+}
+function nextReveal(){
+ const role=impostors.includes(current);
+ document.getElementById('revealRole').textContent=role?'IMPOSTOR':'CREW';
+ document.getElementById('revealRole').style.color=role?'var(--danger)':'var(--accent)';
+ document.getElementById('revealSecret').innerHTML=role?'You do <strong>NOT</strong> know the category.<br>Blend in and figure it out.':`Category<strong>${escapeHtml(category)}</strong>`;
+ document.getElementById('revealBtn').textContent=current===players.length-1?'HIDE & START ROUND':'HIDE & PASS';
+ document.getElementById('revealBtn').onclick=()=>{
+   if(current===players.length-1){document.getElementById('revealBtn').onclick=()=>{};startRound()}
+   else {current++;renderReveal();document.getElementById('revealBtn').onclick=nextReveal}
+ };
+}
+function startRound(){
+ show('round');document.getElementById('category').textContent=category;runTimer(seconds,'timer','bar');
+}
+function showDiscussion(){clearInterval(interval);show('discussion');renderVotes();runTimer(Math.min(30,seconds),'voteTimer',null)}
+function renderVotes(){
+ const box=document.getElementById('voteList');box.innerHTML='';
+ players.forEach((p,i)=>{let row=document.createElement('div');row.className='player';row.innerHTML=`<span>${escapeHtml(p.name)}</span><button class="vote" onclick="selectVote(this,${i})">VOTE</button>`;box.appendChild(row)})
+}
+let selected=new Set();
+function selectVote(btn,i){selected.add(i);btn.classList.toggle('selected');btn.textContent=btn.classList.contains('selected')?'SELECTED':'VOTE'}
+function finishVote(){
+ clearInterval(interval);show('result');
+ document.getElementById('resultCat').textContent=category;
+ document.getElementById('resultImp').textContent=impostors.map(i=>players[i].name).join(', ');
+ const caught=impostors.some(i=>selected.has(i));
+ document.getElementById('resultText').textContent=caught?'Nice! The group found at least one impostor.':'The impostor(s) got away. Run it back!';
+}
+function newRound(){clearInterval(interval);selected.clear();category=pickCategory();impostors=[];while(impostors.length<Math.min(+document.getElementById('impCount').value,Math.floor(players.length/2))){let x=Math.floor(Math.random()*players.length);if(!impostors.includes(x))impostors.push(x)}current=0;show('reveal');renderReveal();document.getElementById('revealBtn').onclick=nextReveal}
+function runTimer(sec,id,barId){let left=sec;let el=document.getElementById(id);el.textContent=left+'s';clearInterval(interval);interval=setInterval(()=>{left--;el.textContent=left+'s';if(barId)document.getElementById(barId).style.width=(left/sec*100)+'%';if(left<=0){clearInterval(interval);if(id==='timer')showDiscussion()}},1000)}
+function escapeHtml(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]))}
+renderNames();
+</script>
+</body>
+</html>
